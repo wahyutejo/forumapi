@@ -1,0 +1,11 @@
+{
+  "editor.minimap.maxColumn": 100,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "editor.formatOnSave": true,
+  "javascript.format.semicolons": "insert",
+  "javascript.format.insertSpaceAfterConstructor": true,
+  "typescript.preferences.quoteStyle": "single",
+  "eslint.format.enable": true,
+  "prettier.singleQuote": true,
+  "prettier.printWidth": 100
+}
