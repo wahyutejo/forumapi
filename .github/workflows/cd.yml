@@ -17,7 +17,7 @@ jobs:
         with:
           instance_name: 'instance-2'
           zone: 'asia-southeast2-a'
-          ssh_private_key: ${{secrets.SSH_KEY}}
+          ssh_private_key: '${{secrets.SSH_KEY}}'
           command: |
             cd ~/forumapi
             git pull origin main
