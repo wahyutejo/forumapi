@@ -10,17 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: 'actions/checkout@v2'
-
-      - id: 'SSH-and-deploy-app'
+      - uses: 'actions/checkout@v3'
+      
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v0'
+        with: 
+          credentials_json: '${{ secrets.gcp_credentials })'
+          
+      - id: 'compute-ssh'
         uses: 'google-github-actions/ssh-compute@v0'
         with:
           instance_name: 'instance-2'
           zone: 'asia-southeast2-a'
-          ssh_private_key: '${{secrets.SSH_KEY}}'
-          command: |
-            cd ~/forumapi
-            git pull origin main
-            npm install
-            npm run migrate up
-            pm2 restart forumapi
+          ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+          command: 'echo Hello World'
