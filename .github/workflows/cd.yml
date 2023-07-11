@@ -10,14 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: SSH and deploy app
-        uses: appleboy/ssh-action@master
+      - uses: 'actions/checkout@v2'
+
+      - id: 'SSH-and-deploy-app'
+        uses: 'google-github-actions/ssh-compute@v0'
         with:
-          host: ${{secrets.SSH_HOST}}
-          username: ${{secrets.SSH_USERNAME}}
-          key: ${{secrets.SSH_KEY}}
-          port: ${{secrets.SSH_PORT}}
-          script: |
+          instance_name: 'instance-2'
+          zone: 'asia-southeast2-a'
+          ssh_private_key: ${{secrets.SSH_KEY}}
+          command: |
             cd ~/forumapi
             git pull origin main
             npm install
