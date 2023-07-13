@@ -1,8 +1,14 @@
 class DetailThreadUseCase {
-  constructor({ threadRepository, commentRepository, replyRepository }) {
+  constructor({
+    threadRepository,
+    commentRepository,
+    replyRepository,
+    likesThreadCommentRepository,
+  }) {
     this._threadRepository = threadRepository;
     this._commentRepository = commentRepository;
     this._replyRepository = replyRepository;
+    this._likesThreadCommentRepository = likesThreadCommentRepository;
   }
 
   async execute(useCasePayload) {
@@ -14,6 +20,7 @@ class DetailThreadUseCase {
     const allComments = this._detailComment(commentDetail);
     const replyDetail = await this._replyRepository.getDetailReply(threadId);
     const allReplies = this._detailReply(replyDetail);
+    const allLikesComment = await this._likesThreadCommentRepository.getLikeCount(threadId);
 
     const comments = [];
     for (let i = 0; i < allComments.length; i += 1) {
@@ -26,7 +33,13 @@ class DetailThreadUseCase {
           username: r.username,
         }));
 
-      const comment = { ...allComments[i], replies };
+      replies.sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+
+      const likeCount = allLikesComment.filter(
+        (like) => like.comment_id === allComments[i].id
+      ).length;
+
+      const comment = { ...allComments[i], likeCount, replies };
 
       comments.push(comment);
     }
