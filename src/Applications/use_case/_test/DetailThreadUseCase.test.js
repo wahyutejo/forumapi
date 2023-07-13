@@ -2,6 +2,7 @@ const CommentsRepository = require('../../../Domains/comments/CommentsRepository
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const DetailThreadUseCase = require('../DetailThreadUseCase');
 const ReplyRepository = require('../../../Domains/reply/ReplyRepository');
+const LikesRepository = require('../../../Domains/likesThreadComment/LikesRepository');
 
 describe('GetDetailThreadUseCase', () => {
   it('should orchestrating get detail thread correctly', async () => {
@@ -63,9 +64,31 @@ describe('GetDetailThreadUseCase', () => {
       },
     ];
 
+    const expectedLikes = [
+      {
+        id: 'likes-1',
+        thread_id: 'thread-123',
+        comment_id: 'comment-1',
+        user_id: 'user-1',
+      },
+      {
+        id: 'likes-2',
+        thread_id: 'thread-123',
+        comment_id: 'comment-1',
+        user_id: 'user-2',
+      },
+      {
+        id: 'likes-3',
+        thread_id: 'thread-123',
+        comment_id: 'comment-2',
+        user_id: 'user-3',
+      },
+    ];
+
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentsRepository();
     const mockReplyRepository = new ReplyRepository();
+    const mockLikesRepository = new LikesRepository();
 
     mockThreadRepository.checkAvaibilityThread = jest
       .fn()
@@ -83,10 +106,15 @@ describe('GetDetailThreadUseCase', () => {
       .fn()
       .mockImplementation(() => Promise.resolve(expectedReply));
 
+    mockLikesRepository.getLikeCount = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve(expectedLikes));
+
     const detailThreadUseCase = new DetailThreadUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
       replyRepository: mockReplyRepository,
+      likesThreadCommentRepository: mockLikesRepository
     });
 
     detailThreadUseCase._detailComment(expectedComment);
@@ -100,6 +128,7 @@ describe('GetDetailThreadUseCase', () => {
     expect(mockThreadRepository.getDetailThread).toBeCalledWith(useCasePayload);
     expect(mockCommentRepository.getDetailComment).toBeCalledWith(useCasePayload);
     expect(mockReplyRepository.getDetailReply).toBeCalledWith(useCasePayload);
+    expect(mockLikesRepository.getLikeCount).toBeCalledWith(useCasePayload);
     expect(detailThread).toStrictEqual({
       id: 'thread-123',
       title: 'judul',
@@ -112,6 +141,7 @@ describe('GetDetailThreadUseCase', () => {
           username: 'user b',
           date: '20062124',
           content: 'komentar',
+          likeCount: 2,
           replies: [
             {
               id: 'reply-1',
@@ -132,6 +162,7 @@ describe('GetDetailThreadUseCase', () => {
           username: 'user c',
           date: '21062124',
           content: 'komentar kedua',
+          likeCount: 1,
           replies: [
             {
               id: 'reply-3',
