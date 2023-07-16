@@ -211,4 +211,59 @@ describe('LikesThreadCommentRepositoryPostgres', () => {
       expect(response).toEqual(1);
     });
   });
+
+  describe('getLikeCount function', () => {
+    it('should get all like comment in thread', async () => {
+      // Arrange
+      const likesThreadCommentRepositoryPostgres = new LikesThreadCommentRepositoryPostgres(
+        pool,
+        {}
+      );
+      await UsersTableTestHelper.addUser({
+        id: 'user-123',
+        username: 'firstUser',
+      });
+
+      await ThreadsTableTestHelper.addThread({
+        id: 'thread-1',
+        body: 'thread pertama',
+        owner: 'user-123',
+      });
+
+      await CommentTableTestHelper.addComment({
+        id: 'comment-1',
+        thread: 'thread-1',
+        content: 'komentar',
+        owner: 'user-123',
+      });
+
+      await LikesTableTestHelper.addLikes({
+        id: 'likes-1',
+        threadId: 'thread-1',
+        commentId: 'comment-1',
+        user: 'user-123',
+      });
+
+      // Second user likes
+      await UsersTableTestHelper.addUser({
+        id: 'user-1',
+        username: 'newUser',
+      });
+
+      await LikesTableTestHelper.addLikes({
+        id: 'likes-2',
+        threadId: 'thread-1',
+        commentId: 'comment-1',
+        user: 'user-1',
+      });
+
+      const threadId = 'thread-1';
+
+      // Action
+      const like = await likesThreadCommentRepositoryPostgres.getLikeCount(threadId);
+
+      // Assert
+      expect(like).toHaveLength(2);
+    });
+  });
 });
